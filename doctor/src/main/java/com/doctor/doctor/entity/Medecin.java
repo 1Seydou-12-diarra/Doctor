@@ -20,11 +20,12 @@ public class Medecin {
     public Medecin() {
     }
 
-    public Medecin(Long id, String nom, String email, String specialite) {
+    public Medecin(String nom, String email, String specialite) {
         this.id = id;
         this.nom = nom;
         this.email = email;
         this.specialite = specialite;
+        this.rendezVousList = rendezVousList;
     }
 
     public Long getId() {

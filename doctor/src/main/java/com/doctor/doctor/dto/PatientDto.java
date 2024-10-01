@@ -1,19 +1,23 @@
 package com.doctor.doctor.dto;
 
+
+
 public class PatientDto {
     private Long id;
     private String nom;
     private String email;
 
-    public PatientDto() {
-    }
-
+    // Constructeur
     public PatientDto(Long id, String nom, String email) {
         this.id = id;
         this.nom = nom;
         this.email = email;
     }
 
+    // Constructeur par défaut (nécessaire pour la désérialisation)
+    public PatientDto() {}
+
+    // Getters et Setters
     public Long getId() {
         return id;
     }
@@ -37,6 +41,4 @@ public class PatientDto {
     public void setEmail(String email) {
         this.email = email;
     }
-// Getters et setters
 }
-

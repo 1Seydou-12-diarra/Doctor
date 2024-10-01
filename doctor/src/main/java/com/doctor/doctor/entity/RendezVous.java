@@ -3,7 +3,6 @@ package com.doctor.doctor.entity;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 
 @Entity
 public class RendezVous {
@@ -11,30 +10,27 @@ public class RendezVous {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private LocalDate dateRdv;
-    private LocalTime heureRdv;
+    private LocalDate date;
 
-    @ManyToOne
-    @JoinColumn(name = "patient_id")
+
+    @ManyToOne(fetch = FetchType.EAGER)  // Charger les entités liées immédiatement
+    @JoinColumn(name = "patient_id", referencedColumnName = "id")
     private Patient patient;
 
-    @ManyToOne
-    @JoinColumn(name = "medecin_id")
+    @ManyToOne(fetch = FetchType.EAGER)  // Charger les entités liées immédiatement
+    @JoinColumn(name = "medecin_id", referencedColumnName = "id")
     private Medecin medecin;
 
-    @OneToOne(mappedBy = "rendezVous")
-    private Consultation consultation;
 
     public RendezVous() {
     }
 
-    public RendezVous(Long id, LocalDate dateRdv, LocalTime heureRdv, Patient patient, Medecin medecin, Consultation consultation) {
+    public RendezVous(Long id, LocalDate date, Patient patient, Medecin medecin) {
         this.id = id;
-        this.dateRdv = dateRdv;
-        this.heureRdv = heureRdv;
+        this.date = date;
         this.patient = patient;
         this.medecin = medecin;
-        this.consultation = consultation;
+
     }
 
     public Long getId() {
@@ -45,20 +41,12 @@ public class RendezVous {
         this.id = id;
     }
 
-    public LocalDate getDateRdv() {
-        return dateRdv;
+    public LocalDate getDate() {
+        return date;
     }
 
-    public void setDateRdv(LocalDate dateRdv) {
-        this.dateRdv = dateRdv;
-    }
-
-    public LocalTime getHeureRdv() {
-        return heureRdv;
-    }
-
-    public void setHeureRdv(LocalTime heureRdv) {
-        this.heureRdv = heureRdv;
+    public void setDate(LocalDate date) {
+        this.date = date;
     }
 
     public Patient getPatient() {
@@ -76,13 +64,4 @@ public class RendezVous {
     public void setMedecin(Medecin medecin) {
         this.medecin = medecin;
     }
-
-    public Consultation getConsultation() {
-        return consultation;
-    }
-
-    public void setConsultation(Consultation consultation) {
-        this.consultation = consultation;
-    }
-// Getters et setters
 }

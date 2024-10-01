@@ -1,25 +1,21 @@
 package com.doctor.doctor.dto;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 
 public class RendezVousDto {
     private Long id;
-    private LocalDate dateRdv;
-    private LocalTime heureRdv;
-    private Long patientId;
-    private Long medecinId;
-
+    private LocalDate date;
+    private PatientDto patient;
+    private MedecinDto medecin;
 
     public RendezVousDto() {
     }
 
-    public RendezVousDto(Long id, LocalDate dateRdv, LocalTime heureRdv, Long patientId, Long medecinId) {
+    public RendezVousDto(Long id, LocalDate date, PatientDto patient, MedecinDto medecin) {
         this.id = id;
-        this.dateRdv = dateRdv;
-        this.heureRdv = heureRdv;
-        this.patientId = patientId;
-        this.medecinId = medecinId;
+        this.date = date;
+        this.patient = patient;
+        this.medecin = medecin;
     }
 
     public Long getId() {
@@ -30,38 +26,28 @@ public class RendezVousDto {
         this.id = id;
     }
 
-    public LocalDate getDateRdv() {
-        return dateRdv;
+    public LocalDate getDate() {
+        return date;
     }
 
-    public void setDateRdv(LocalDate dateRdv) {
-        this.dateRdv = dateRdv;
+    public void setDate(LocalDate date) {
+        this.date = date;
     }
 
-    public LocalTime getHeureRdv() {
-        return heureRdv;
+    public PatientDto getPatient() {
+        return patient;
     }
 
-    public void setHeureRdv(LocalTime heureRdv) {
-        this.heureRdv = heureRdv;
+    public void setPatient(PatientDto patient) {
+        this.patient = patient;
     }
 
-    public Long getPatientId() {
-        return patientId;
+    public MedecinDto getMedecin() {
+        return medecin;
     }
 
-    public void setPatientId(Long patientId) {
-        this.patientId = patientId;
+    public void setMedecin(MedecinDto medecin) {
+        this.medecin = medecin;
     }
-
-    public Long getMedecinId() {
-        return medecinId;
-    }
-
-    public void setMedecinId(Long medecinId) {
-        this.medecinId = medecinId;
-    }
-
-
 // Getters et setters
 }

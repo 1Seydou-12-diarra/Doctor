@@ -1,7 +1,10 @@
 package com.doctor.doctor.dto;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class MedecinDto {
-    private Long id;
+    private Integer id;
     private String nom;
     private String email;
     private String specialite;
@@ -9,18 +12,18 @@ public class MedecinDto {
     public MedecinDto() {
     }
 
-    public MedecinDto(Long id, String nom, String email, String specialite) {
+    public MedecinDto(Integer id, String nom, String email, String specialite) {
         this.id = id;
         this.nom = nom;
         this.email = email;
         this.specialite = specialite;
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

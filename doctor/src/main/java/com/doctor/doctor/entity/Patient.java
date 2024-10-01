@@ -16,15 +16,14 @@ public class Patient {
     @OneToMany(mappedBy = "patient")
     private List<RendezVous> rendezVousList;
 
+    public Patient() {
+    }
+
     public Patient(Long id, String nom, String email) {
-        this.id = id;
+        this.id = id ;
         this.nom = nom;
         this.email = email;
-    }
-// Getters et setters
-
-    public Patient() {
-
+        this.rendezVousList = rendezVousList;
     }
 
     public Long getId() {
@@ -59,4 +58,9 @@ public class Patient {
         this.rendezVousList = rendezVousList;
     }
 }
+
+
+
+
+
 

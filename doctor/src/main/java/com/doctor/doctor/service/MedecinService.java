@@ -12,61 +12,53 @@ import java.util.stream.Collectors;
 
 @Service
 public class MedecinService {
-
     @Autowired
     private MedecinRepository medecinRepository;
 
-
-    // Récupérer tous les médecins
+    // Méthode pour récupérer tous les médecins
     public List<MedecinDto> getAllMedecins() {
         return medecinRepository.findAll()
                 .stream()
-                .map(medecin -> mapToDto(medecin))
+                .map(medecin -> new MedecinDto(Math.toIntExact(medecin.getId()), medecin.getNom(), medecin.getEmail(), medecin.getSpecialite()))
                 .collect(Collectors.toList());
     }
 
-    // Récupérer un médecin par son id
+    // Méthode pour récupérer un médecin par son ID
     public MedecinDto getMedecinById(Long id) {
-        Medecin medecin = medecinRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Médecin not found with id " + id));
-        return mapToDto(medecin);
+        return medecinRepository.findById(id)
+                .map(medecin -> new MedecinDto(Math.toIntExact(medecin.getId()),medecin.getNom(), medecin.getEmail(), medecin.getSpecialite()))
+                .orElseThrow(() -> new ResourceNotFoundException("Médecin non trouvé"));
     }
 
-    // Créer un nouveau médecin
-    public MedecinDto createMedecin(MedecinDto medecinDto) {
-        Medecin medecin = mapToEntity(medecinDto);
+    // Méthode pour créer un médecin
+    public MedecinDto createMedecin(MedecinDto dto) {
+        Medecin medecin = new Medecin();
+        medecin.setNom(dto.getNom());
+        medecin.setEmail(dto.getEmail());
+        medecin.setSpecialite(dto.getSpecialite());
+
         Medecin savedMedecin = medecinRepository.save(medecin);
-        return mapToDto(savedMedecin);
+        return new MedecinDto(Math.toIntExact(savedMedecin.getId()), savedMedecin.getNom(), savedMedecin.getEmail(), savedMedecin.getSpecialite());
     }
 
-    // Mettre à jour un médecin existant
-    public MedecinDto updateMedecin(Long id, MedecinDto medecinDto) {
-        Medecin existingMedecin = medecinRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Médecin not found with id " + id));
+    // Méthode pour mettre à jour un médecin
+    public MedecinDto updateMedecin(Long id, MedecinDto dto) {
+        Medecin medecin = medecinRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Médecin non trouvé"));
 
-        existingMedecin.setNom(medecinDto.getNom());
-        existingMedecin.setEmail(medecinDto.getEmail());
-        existingMedecin.setSpecialite(medecinDto.getSpecialite());
+        medecin.setNom(dto.getNom());
+        medecin.setEmail(dto.getEmail());
+        medecin.setSpecialite(dto.getSpecialite());
 
-        Medecin updatedMedecin = medecinRepository.save(existingMedecin);
-        return mapToDto(updatedMedecin);
+        Medecin updatedMedecin = medecinRepository.save(medecin);
+        return new MedecinDto(Math.toIntExact(updatedMedecin.getId()), updatedMedecin.getNom(), updatedMedecin.getEmail(), updatedMedecin.getSpecialite());
     }
 
-    // Supprimer un médecin par son id
+    // Méthode pour supprimer un médecin
     public void deleteMedecin(Long id) {
-        Medecin existingMedecin = medecinRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Médecin not found with id " + id));
-        medecinRepository.delete(existingMedecin);
-    }
+        Medecin medecin = medecinRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Médecin non trouvé"));
 
-    // Mapper une entité Medecin en DTO
-    private MedecinDto mapToDto(Medecin medecin) {
-        return new MedecinDto(medecin.getId(), medecin.getNom(), medecin.getEmail(), medecin.getSpecialite());
-    }
-
-    // Mapper un DTO Medecin en entité
-    private Medecin mapToEntity(MedecinDto medecinDto) {
-        return new Medecin(medecinDto.getId(), medecinDto.getNom(), medecinDto.getEmail(), medecinDto.getSpecialite());
+        medecinRepository.delete(medecin);
     }
 }
-

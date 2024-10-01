@@ -16,30 +16,32 @@ public class RendezVousController {
     @Autowired
     private RendezVousService rendezVousService;
 
+    // Récupérer la liste des rendez-vous
     @GetMapping
-    public List<RendezVousDto> getAllRendezVous() {
-        return rendezVousService.getAllRendezVous();
+    public ResponseEntity<List<RendezVousDto>> getAllRendezVous() {
+        List<RendezVousDto> rendezVousList = rendezVousService.getListeRendezVous();
+        return new ResponseEntity<>(rendezVousList, HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<RendezVousDto> getRendezVousById(@PathVariable Long id) {
-        return ResponseEntity.ok(rendezVousService.getRendezVousById(id));
-    }
-
+    // Créer un nouveau rendez-vous
     @PostMapping
     public ResponseEntity<RendezVousDto> createRendezVous(@RequestBody RendezVousDto rendezVousDto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(rendezVousService.createRendezVous(rendezVousDto));
+        RendezVousDto createdRendezVous = rendezVousService.createRendezVous(rendezVousDto);
+        return new ResponseEntity<>(createdRendezVous, HttpStatus.CREATED);
     }
 
+    // Mettre à jour un rendez-vous existant
     @PutMapping("/{id}")
-    public ResponseEntity<RendezVousDto> updateRendezVous(@PathVariable Long id, @RequestBody RendezVousDto rendezVousDto) {
-        return ResponseEntity.ok(rendezVousService.updateRendezVous(id, rendezVousDto));
+    public ResponseEntity<RendezVousDto> updateRendezVous(
+            @PathVariable Long id, @RequestBody RendezVousDto rendezVousDto) {
+        RendezVousDto updatedRendezVous = rendezVousService.updateRendezVous(id, rendezVousDto);
+        return new ResponseEntity<>(updatedRendezVous, HttpStatus.OK);
     }
 
+    // Supprimer un rendez-vous
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteRendezVous(@PathVariable Long id) {
         rendezVousService.deleteRendezVous(id);
-        return ResponseEntity.noContent().build();
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
-

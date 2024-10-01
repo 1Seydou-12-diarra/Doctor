@@ -1,13 +1,12 @@
 package com.doctor.doctor.service;
 
 import com.doctor.doctor.Exception.ResourceNotFoundException;
-import com.doctor.doctor.dto.ConsultationDto;
+import com.doctor.doctor.dto.MedecinDto;
+import com.doctor.doctor.dto.PatientDto;
 import com.doctor.doctor.dto.RendezVousDto;
-import com.doctor.doctor.entity.Consultation;
 import com.doctor.doctor.entity.Medecin;
 import com.doctor.doctor.entity.Patient;
 import com.doctor.doctor.entity.RendezVous;
-import com.doctor.doctor.repository.ConsultationRepository;
 import com.doctor.doctor.repository.MedecinRepository;
 import com.doctor.doctor.repository.PatientRepository;
 import com.doctor.doctor.repository.RendezVousRepository;
@@ -22,114 +21,88 @@ public class RendezVousService {
 
     @Autowired
     private RendezVousRepository rendezVousRepository;
-
     @Autowired
     private PatientRepository patientRepository;
-
     @Autowired
     private MedecinRepository medecinRepository;
 
-    @Autowired
-    private ConsultationRepository consultationRepository; // Ajout du repo de consultation
-
-    // Récupérer tous les rendez-vous
-    public List<RendezVousDto> getAllRendezVous() {
-        return rendezVousRepository.findAll()
-                .stream()
-                .map(rv -> mapToDto(rv))
+    public List<RendezVousDto> getListeRendezVous() {
+        List<RendezVous> rendezVousList = rendezVousRepository.findAll();
+        return rendezVousList.stream()
+                .map(this::convertToDto)  // Convertir l'entité en DTO si nécessaire
                 .collect(Collectors.toList());
     }
-
-    // Récupérer un rendez-vous par son id
-    public RendezVousDto getRendezVousById(Long id) {
-        RendezVous rendezVous = rendezVousRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Rendez-vous not found with id " + id));
-        return mapToDto(rendezVous);
-    }
-
-    // Créer un nouveau rendez-vous avec éventuellement une consultation associée
-    public RendezVousDto createRendezVous(RendezVousDto rendezVousDto) {
-        Patient patient = patientRepository.findById(rendezVousDto.getPatientId())
-                .orElseThrow(() -> new ResourceNotFoundException("Patient not found with id " + rendezVousDto.getPatientId()));
-
-        Medecin medecin = medecinRepository.findById(rendezVousDto.getMedecinId())
-                .orElseThrow(() -> new ResourceNotFoundException("Medecin not found with id " + rendezVousDto.getMedecinId()));
+    public RendezVousDto createRendezVous(RendezVousDto dto) {
+        // Vérifiez si le médecin existe déjà dans la base de données
+        Medecin medecin = medecinRepository.findById(Long.valueOf(dto.getMedecin().getId()))
+                .orElseThrow(() -> new ResourceNotFoundException("Médecin non trouvé"));
+// Vérifiez si le patient existe déjà dans la base de données
+        Patient patient = patientRepository.findById(Long.valueOf(dto.getPatient().getId()))
+                .orElseThrow(() -> new ResourceNotFoundException("Patient non trouvé"));
 
 
-        RendezVous rendezVous = mapToEntity(rendezVousDto);
-        rendezVous.setPatient(patient);
-        rendezVous.setMedecin(medecin);
+        // Créez un nouveau rendez-vous
+        RendezVous rendezVous = new RendezVous();
+        rendezVous.setDate(dto.getDate());
+        rendezVous.setMedecin(medecin);  // Référence le médecin existant
+        rendezVous.setPatient(patient);   // Référence le patient existant
 
-
+        // Sauvegardez le rendez-vous dans la base de données
         RendezVous savedRendezVous = rendezVousRepository.save(rendezVous);
-        return mapToDto(savedRendezVous);
+
+        return convertToDto(savedRendezVous);  // Convertir en DTO avant de retourner
     }
 
-    // Mettre à jour un rendez-vous avec une consultation associée
+
     public RendezVousDto updateRendezVous(Long id, RendezVousDto rendezVousDto) {
+        // Récupérer le rendez-vous existant à partir de l'id
         RendezVous existingRendezVous = rendezVousRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Rendez-vous not found with id " + id));
+                .orElseThrow(() -> new RuntimeException("Rendez-vous non trouvé avec l'id : " + id));
 
-        Patient patient = patientRepository.findById(rendezVousDto.getPatientId())
-                .orElseThrow(() -> new ResourceNotFoundException("Patient not found with id " + rendezVousDto.getPatientId()));
+        // Mise à jour des champs
+        existingRendezVous.setDate(rendezVousDto.getDate());
+        existingRendezVous.setPatient(convertToEntity(rendezVousDto.getPatient()));
+        existingRendezVous.setMedecin(convertToEntity(rendezVousDto.getMedecin()));
 
-        Medecin medecin = medecinRepository.findById(rendezVousDto.getMedecinId())
-                .orElseThrow(() -> new ResourceNotFoundException("Medecin not found with id " + rendezVousDto.getMedecinId()));
-
-        existingRendezVous.setDateRdv(rendezVousDto.getDateRdv());
-        existingRendezVous.setHeureRdv(rendezVousDto.getHeureRdv());
-        existingRendezVous.setPatient(patient);
-        existingRendezVous.setMedecin(medecin);
-
-
-
+        // Sauvegarder les modifications
         RendezVous updatedRendezVous = rendezVousRepository.save(existingRendezVous);
-        return mapToDto(updatedRendezVous);
+
+        // Retourner le DTO mis à jour
+        return convertToDto(updatedRendezVous);
     }
 
-    // Supprimer un rendez-vous et sa consultation associée
     public void deleteRendezVous(Long id) {
+        // Vérifier si le rendez-vous existe
         RendezVous existingRendezVous = rendezVousRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Rendez-vous not found with id " + id));
+                .orElseThrow(() -> new RuntimeException("Rendez-vous non trouvé avec l'id : " + id));
 
-        // Supprimer la consultation si elle existe
-        if (existingRendezVous.getConsultation() != null) {
-            consultationRepository.delete(existingRendezVous.getConsultation());
-        }
-
+        // Supprimer le rendez-vous
         rendezVousRepository.delete(existingRendezVous);
     }
 
-    // Mapper une entité RendezVous en DTO
-    private RendezVousDto mapToDto(RendezVous rendezVous) {
-        ConsultationDto consultationDto = null;
-        if (rendezVous.getConsultation() != null) {
-            consultationDto = new ConsultationDto(
-                    rendezVous.getConsultation().getId(),
-                    rendezVous.getConsultation().getDate(),
-                    rendezVous.getConsultation().getRapport(),
-                    rendezVous.getId()
-            );
-        }
-
+    private RendezVousDto convertToDto(RendezVous rendezVous) {
         return new RendezVousDto(
                 rendezVous.getId(),
-                rendezVous.getDateRdv(),
-                rendezVous.getHeureRdv(),
-                rendezVous.getPatient().getId(),
-                rendezVous.getMedecin().getId()
+                rendezVous.getDate(),
+                convertToDto(rendezVous.getPatient()),  // Inclure les détails du patient
+                convertToDto(rendezVous.getMedecin())   // Inclure les détails du médecin
         );
     }
 
-    // Mapper un DTO RendezVous en entité
-    private RendezVous mapToEntity(RendezVousDto rendezVousDto) {
-        RendezVous rendezVous = new RendezVous();
-        rendezVous.setId(rendezVousDto.getId());
-        rendezVous.setDateRdv(rendezVousDto.getDateRdv());
-        rendezVous.setHeureRdv(rendezVousDto.getHeureRdv());
-        return rendezVous;
+    private PatientDto convertToDto(Patient patient) {
+        return new PatientDto((long) Math.toIntExact(patient.getId()), patient.getNom(), patient.getEmail());
+    }
+
+    private MedecinDto convertToDto(Medecin medecin) {
+        return new MedecinDto(Math.toIntExact(medecin.getId()), medecin.getNom(), medecin.getEmail(), medecin.getSpecialite());
     }
 
 
-}
+    private Patient convertToEntity(PatientDto patientDto) {
+        return new Patient((long) Math.toIntExact(patientDto.getId()), patientDto.getNom(), patientDto.getEmail());
+    }
 
+    private Medecin convertToEntity(MedecinDto medecinDto) {
+        return new Medecin( medecinDto.getNom(), medecinDto.getEmail(), medecinDto.getSpecialite());
+    }
+}
