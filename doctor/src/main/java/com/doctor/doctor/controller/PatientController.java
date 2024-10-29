@@ -36,10 +36,11 @@ public class PatientController {
         return ResponseEntity.ok(patientService.updatePatient(id, patientDto));
     }
 
+    // Supprimer un patient
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePatient(@PathVariable Long id) {
         patientService.deletePatient(id);
-        return ResponseEntity.noContent().build();
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT); // 204 No Content
     }
 }
 

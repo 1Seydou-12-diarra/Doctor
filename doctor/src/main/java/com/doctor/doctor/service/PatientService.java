@@ -4,6 +4,8 @@ import com.doctor.doctor.Exception.ResourceNotFoundException;
 import com.doctor.doctor.dto.PatientDto;
 import com.doctor.doctor.entity.Patient;
 import com.doctor.doctor.repository.PatientRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +16,7 @@ import java.util.stream.Collectors;
 public class PatientService {
     @Autowired
     private PatientRepository patientRepository;
+    private static final Logger logger = LoggerFactory.getLogger(PatientService.class);
 
     // Récupérer tous les patients
     public List<PatientDto> getAllPatients() {
@@ -68,6 +71,7 @@ public class PatientService {
                 .orElseThrow(() -> new ResourceNotFoundException("Patient non trouvé"));
 
         patientRepository.delete(patient);
+        logger.info("Patient avec ID {} a été supprimé avec succès.", id);
     }
 }
 
