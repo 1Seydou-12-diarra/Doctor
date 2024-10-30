@@ -6,11 +6,14 @@ import com.doctor.doctor.entity.Medecin;
 import com.doctor.doctor.repository.MedecinRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@CrossOrigin(origins = "http://127.0.0.1:3001") // Spécifiez l'origine autorisée
+
 public class MedecinService {
     @Autowired
     private MedecinRepository medecinRepository;
